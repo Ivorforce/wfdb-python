@@ -39,3 +39,12 @@ from wfdb.io.download import (
     set_db_index_url,
 )
 from wfdb.io.tff import rdtff
+
+from wfdb.io.datasource import (
+    DataSource,
+    DataSourceType,
+    show_data_sources,
+    add_data_source,
+    remove_data_source,
+    reset_data_sources,
+)
