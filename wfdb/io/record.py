@@ -879,33 +879,13 @@ class Record(BaseRecord, _header.HeaderMixin, _signal.SignalMixin):
 
         cp = copy(self.record)
 
-        cp.sig_len = len(t_idx_list)
-        cp.n_sig = len(c_idx_list)
-
-        cp.sig_name = [self.record.sig_name[idx] for idx in c_idx_list]
-
-        cp._adjust_datetime(t_idx_list[0])
-
-        # Go through all properties that might be per-channel.
-        for attribute_name in [
-            'fmt', 'units', 'block_size',
-            'adc_gain', 'adc_res', 'adc_zero',
-            'init_value', 'baseline',
-            'file_name', 'checksum',
-            'samps_per_frame',
-        ]:
-            current_value = getattr(self.record, attribute_name)
-            # Might be None or a direct value that applies to all channels as a default.
-            if isinstance(current_value, Sequence):
-                setattr(cp, attribute_name, [current_value[idx] for idx in c_idx_list])
-
-        # Subselect signal.
-
         cp.p_signal = cp.p_signal[t_idx, c_idx].copy() if cp.p_signal is not None else None
         cp.d_signal = cp.d_signal[t_idx, c_idx].copy() if cp.d_signal is not None else None
 
         cp.e_p_signal = [cp.e_p_signal[idx][t_idx].copy() for idx in c_idx_list] if cp.e_p_signal is not None else None
         cp.e_d_signal = [cp.e_p_signal[idx][t_idx].copy() for idx in c_idx_list] if cp.e_d_signal is not None else None
+
+        cp._arrange_fields(channels=c_idx_list, sampfrom=t_idx_list[0])
 
         return cp
 
